@@ -15,8 +15,9 @@ buildscript {
         jcenter {
     url 'https://nexus.xebialabs.com/nexus/content/groups/public/'
 }
-        google()
-        mavenCentral()
+        mavenCentral{
+            url 'https://maven.aliyun.com/repository/central'
+        }
     }
     dependencies {
         classpath("com.android.tools.build:gradle:4.2.2")
@@ -33,7 +34,9 @@ allprojects {
         jcenter {
     url 'https://nexus.xebialabs.com/nexus/content/groups/public/'
 }
-        mavenCentral()
+        mavenCentral{
+            url 'https://maven.aliyun.com/repository/central'
+        }
         mavenLocal()
         maven {
             // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
@@ -44,7 +47,6 @@ allprojects {
             url("$rootDir/../node_modules/jsc-android/dist")
         }
 
-        google()
         maven { url 'https://www.jitpack.io' }
     }
 }

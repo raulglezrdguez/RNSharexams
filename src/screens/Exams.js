@@ -42,6 +42,7 @@ const Exams = () => {
   const createFile = (name, content) => {
     // create a path you want to write to
     const path = RNFS.ExternalDirectoryPath + `/${name}`;
+    console.log('path: ', path);
 
     RNFS.exists(path)
       .then(fileExists => {

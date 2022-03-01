@@ -1,7 +1,14 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useState} from 'react';
 import {ScrollView, StyleSheet, View} from 'react-native';
-import {Button, List, Snackbar, Title, useTheme} from 'react-native-paper';
+import {
+  Button,
+  Card,
+  List,
+  Snackbar,
+  Title,
+  useTheme,
+} from 'react-native-paper';
 import RNFS from 'react-native-fs';
 
 import {
@@ -88,23 +95,25 @@ const ShowExpedients = () => {
         setId2Edit={setId2Edit}
       />
     ) : (
-      <List.Item
-        key={exp.id}
-        title={`${exp.name} - ${exp.identifier}`}
-        titleNumberOfLines={2}
-        right={() => (
-          <Button icon="account-edit" onPress={() => setId2Edit(exp.id)} />
-        )}
-        left={() => (
-          <Button
-            color={colors.error}
-            icon="delete"
-            onPress={() => {
-              delExpedient(exp.id);
-            }}
-          />
-        )}
-      />
+      <Card>
+        <List.Item
+          key={exp.id}
+          title={`${exp.name} - ${exp.identifier}`}
+          titleNumberOfLines={2}
+          right={() => (
+            <Button icon="account-edit" onPress={() => setId2Edit(exp.id)} />
+          )}
+          left={() => (
+            <Button
+              color={colors.error}
+              icon="delete"
+              onPress={() => {
+                delExpedient(exp.id);
+              }}
+            />
+          )}
+        />
+      </Card>
     ),
   );
 

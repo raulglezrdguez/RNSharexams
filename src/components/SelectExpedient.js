@@ -1,6 +1,6 @@
 import React from 'react';
 import {ScrollView, StyleSheet, View} from 'react-native';
-import {Button, List, Title} from 'react-native-paper';
+import {Button, Card, List, Title} from 'react-native-paper';
 
 import {usePreferencesState} from '../context/preferences';
 
@@ -8,18 +8,20 @@ const SelectExpedients = ({setExpedient}) => {
   const {expedients} = usePreferencesState();
 
   const expList = expedients.map(exp => (
-    <List.Item
-      key={exp.identifier}
-      title={`${exp.name} - ${exp.identifier}`}
-      right={() => (
-        <Button
-          icon="play"
-          onPress={() => {
-            setExpedient(exp);
-          }}
-        />
-      )}
-    />
+    <Card>
+      <List.Item
+        key={exp.identifier}
+        title={`${exp.name} - ${exp.identifier}`}
+        right={() => (
+          <Button
+            icon="play"
+            onPress={() => {
+              setExpedient(exp);
+            }}
+          />
+        )}
+      />
+    </Card>
   ));
 
   return (

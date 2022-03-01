@@ -11,20 +11,33 @@ import {
   Title,
 } from 'react-native-paper';
 import RNFS from 'react-native-fs';
+import DropDown from 'react-native-paper-dropdown';
 
 import {
   usePreferencesState,
   usePreferencesDispatch,
 } from '../context/preferences';
 
+import provincesList from '../data/provinces';
+import municipalitiesList from '../data/municipalities';
+
+import {validateBirthdate} from '../utils/date';
+
 const NewExpedient = () => {
   const {expedients} = usePreferencesState();
   const dispatch = usePreferencesDispatch();
 
+  const [cp, setCP] = useState(''); // consejo popular
+  const [clinic, setClinic] = useState(''); // consultorio medico
   const [name, setName] = useState('');
   const [birthdate, setBirthdate] = useState('01-01-1950');
   const [sex, setSex] = useState('femenino');
   const [identifier, setIdentifier] = useState('');
+
+  const [showProvinceList, setShowProvinceList] = useState(false);
+  const [province, setProvince] = useState('25'); // provincia
+  const [showMunicipalityList, setShowMunicipalityList] = useState(false);
+  const [municipality, setMunicipality] = useState('01'); // municipio
 
   const [snackVisible, setSnackVisible] = useState(false);
   const [snackMessage, setSnackMessage] = useState('');
@@ -68,60 +81,16 @@ const NewExpedient = () => {
     }
   };
 
-  const daysInMonth = (month, year) => {
-    if ([1, 3, 5, 7, 8, 10, 12].includes(month)) {
-      return 31;
-    }
-    if ([4, 6, 9, 11].includes(month)) {
-      return 30;
-    }
-    // February has 29 days in any year evenly divisible by four,
-    // EXCEPT for centurial years which are not also divisible by 400.
-    return year % 4 === 0 && (!(year % 100 === 0) || year % 400 === 0)
-      ? 29
-      : 28;
-  };
-
-  const validateBirthdate = () => {
-    let validation = /^\d{1,2}-\d{1,2}-\d{4}$/.test(birthdate);
-    if (!validation) {
-      return false;
-    }
-    validation = birthdate.split('-');
-    const currentYear = new Date().getFullYear();
-    const currentMonth = new Date().getMonth() + 1;
-    const currentDay = new Date().getDate();
-    const day = +validation[0];
-    const month = +validation[1];
-    const year = +validation[2];
-    if (year > currentYear || year < currentYear - 110) {
-      return false;
-    }
-    if (month < 1 || month > 12) {
-      return false;
-    }
-    if (year === currentYear && month > currentMonth) {
-      return false;
-    }
-    if (year === currentYear && month === currentMonth && day > currentDay) {
-      return false;
-    }
-    const maxDays = daysInMonth(month, year);
-    if (day > maxDays) {
-      return false;
-    }
-
-    return true;
-  };
-
   const validateForm = () => {
-    if (validateBirthdate === false) {
+    if (validateBirthdate(birthdate) === false) {
       return false;
     }
     return (
       name.trim().length > 6 &&
       sex.trim().length > 7 &&
-      identifier.trim().length > 5
+      identifier.trim().length === 11 &&
+      cp.trim().length > 0 &&
+      clinic.trim().length > 0
     );
   };
 
@@ -148,10 +117,30 @@ const NewExpedient = () => {
     );
   };
 
+  const changeProvince = newProvince => {
+    setProvince(newProvince);
+    setMunicipality('01');
+  };
+
+  const getMunicipalitiesList = () =>
+    municipalitiesList
+      .filter(m => m.prov === province)
+      .map(m => ({label: m.label, value: m.mun}));
+
   const sendForm = () => {
     if (validateForm()) {
       const id = guid();
-      const expedient = {id, name, birthdate, sex, identifier};
+      const expedient = {
+        id,
+        name,
+        birthdate,
+        sex,
+        identifier,
+        province,
+        municipality,
+        cp,
+        clinic,
+      };
 
       addExpedient(expedient);
     } else {
@@ -165,18 +154,68 @@ const NewExpedient = () => {
       <View style={styles.form}>
         <Title style={{marginTop: 10}}>Creando</Title>
         <ScrollView style={styles.scroll}>
+          <DropDown
+            label={'Provincia'}
+            mode={'outlined'}
+            visible={showProvinceList}
+            showDropDown={() => setShowProvinceList(true)}
+            onDismiss={() => setShowProvinceList(false)}
+            value={province}
+            setValue={newProvince => changeProvince(newProvince)}
+            list={provincesList}
+          />
+
+          <DropDown
+            label={'Municipio'}
+            mode={'outlined'}
+            visible={showMunicipalityList}
+            showDropDown={() => setShowMunicipalityList(true)}
+            onDismiss={() => setShowMunicipalityList(false)}
+            value={municipality}
+            setValue={setMunicipality}
+            list={getMunicipalitiesList()}
+          />
+
+          <TextInput
+            label="Consejo popular"
+            value={cp}
+            onChangeText={value => setCP(value)}
+            mode="outlined"
+            placeholder="Consejo popular"
+            error={cp.trim().length === 0}
+            style={{marginTop: 10}}
+            autoCapitalize={'words'}
+          />
+          <HelperText type="error" visible={cp.trim().length === 0}>
+            {cp.trim().length === 0 && 'Consejo popular incorrecto'}
+          </HelperText>
+
+          <TextInput
+            label="Consultorio"
+            value={clinic}
+            onChangeText={value => setClinic(value)}
+            mode="outlined"
+            placeholder="Consultorio"
+            error={clinic.trim().length === 0}
+            style={{marginTop: 10}}
+            keyboardType={'number-pad'}
+          />
+          <HelperText type="error" visible={clinic.trim().length === 0}>
+            {clinic.trim().length === 0 && 'Consultorio incorrecto'}
+          </HelperText>
+
           <TextInput
             label="Identificador"
             value={identifier}
             onChangeText={iden => setIdentifier(iden)}
             mode="outlined"
             placeholder="Identificador"
-            error={identifier.length < 6}
+            error={identifier.length !== 11}
             style={{marginTop: 10}}
             keyboardType={'number-pad'}
           />
-          <HelperText type="error" visible={identifier.length < 6}>
-            {identifier.length < 6 && 'Identificador incorrecto'}
+          <HelperText type="error" visible={identifier.length !== 11}>
+            {identifier.length !== 11 && 'Identificador incorrecto'}
           </HelperText>
 
           <TextInput
@@ -209,12 +248,14 @@ const NewExpedient = () => {
             onChangeText={bd => setBirthdate(bd)}
             mode="outlined"
             placeholder="día-mes-año"
-            error={validateBirthdate() === false}
+            error={validateBirthdate(birthdate) === false}
             style={{marginTop: 10}}
             keyboardType={'numeric'}
           />
-          <HelperText type="error" visible={validateBirthdate() === false}>
-            {validateBirthdate() === false && 'Fecha incorrecta'}
+          <HelperText
+            type="error"
+            visible={validateBirthdate(birthdate) === false}>
+            {validateBirthdate(birthdate) === false && 'Fecha incorrecta'}
           </HelperText>
 
           <Button

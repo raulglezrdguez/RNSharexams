@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useState} from 'react';
 import {ScrollView, StyleSheet, View} from 'react-native';
-import {Button, List, Title} from 'react-native-paper';
+import {Button, Card, List, Title} from 'react-native-paper';
 
 import {usePreferencesState} from '../context/preferences';
 import ShowExamsDetails from './ShowExamsDetails';
@@ -19,14 +19,16 @@ const ShowExams = () => {
         setId2Show={setId2Show}
       />
     ) : (
-      <List.Item
-        key={exp.id}
-        title={`${exp.name} - ${exp.identifier}`}
-        titleNumberOfLines={2}
-        right={() => (
-          <Button icon="page-next" onPress={() => setId2Show(exp.id)} />
-        )}
-      />
+      <Card>
+        <List.Item
+          key={exp.id}
+          title={`${exp.name} - ${exp.identifier}`}
+          titleNumberOfLines={2}
+          right={() => (
+            <Button icon="page-next" onPress={() => setId2Show(exp.id)} />
+          )}
+        />
+      </Card>
     ),
   );
 
