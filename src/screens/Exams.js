@@ -1,10 +1,20 @@
 import React, {useState, useEffect} from 'react';
 import {ScrollView, View, StyleSheet} from 'react-native';
-import {Button, Headline, Snackbar, useTheme} from 'react-native-paper';
+import {
+  Button,
+  Headline,
+  IconButton,
+  Text,
+  Title,
+  useTheme,
+} from 'react-native-paper';
 
 import RNFS from 'react-native-fs';
 
-import {usePreferencesState} from '../context/preferences';
+import {
+  usePreferencesState,
+  usePreferencesDispatch,
+} from '../context/preferences';
 
 import SelectExpedients from '../components/SelectExpedient';
 import SelectKb from '../components/SelectKb';
@@ -14,15 +24,11 @@ import ShowResult from '../components/ShowResult';
 const Exams = () => {
   const {colors} = useTheme();
   const {expedients} = usePreferencesState();
+  const dispatch = usePreferencesDispatch();
 
   const [expedient, setExpedient] = useState(null);
   const [kb, setKb] = useState(null);
   const [result, setResult] = useState(null);
-
-  const [snackVisible, setSnackVisible] = useState(false);
-  const [snackMessage, setSnackMessage] = useState('');
-
-  const onDismissSnackBar = () => setSnackVisible(false);
 
   useEffect(() => {
     setExpedient(null);
@@ -50,23 +56,31 @@ const Exams = () => {
           RNFS.writeFile(path, content, 'utf8')
             .then(success => {
               console.log('FILE WRITTEN! ' + path, content);
-              setSnackMessage('Datos almacenados.');
-              setSnackVisible(true);
+              dispatch({
+                type: 'SET_SNACK_MESSAGE',
+                payload: 'Datos almacenados.',
+              });
             })
             .catch(err => {
-              console.log(err.message);
-              setSnackMessage('Error al almacenar los datos.');
-              setSnackVisible(true);
+              console.log(err);
+              dispatch({
+                type: 'SET_SNACK_MESSAGE',
+                payload: 'Error al almacenar los datos.',
+              });
             });
         } else {
-          setSnackMessage('El fichero existe.');
-          setSnackVisible(true);
+          dispatch({
+            type: 'SET_SNACK_MESSAGE',
+            payload: 'El fichero existe.',
+          });
         }
       })
       .catch(err => {
-        setSnackMessage('Error al almacenar los datos.');
-        setSnackVisible(true);
-        console.log(err.message);
+        console.log(err);
+        dispatch({
+          type: 'SET_SNACK_MESSAGE',
+          payload: 'Error al almacenar los datos.',
+        });
       });
   };
 
@@ -116,40 +130,35 @@ const Exams = () => {
       <View style={styles.container}>
         <Headline />
         {expedient && (
-          <Button
-            color={colors.primary}
-            icon="close"
-            onPress={() => {
-              clearExpedient();
-            }}>
-            {expedient.name}
-          </Button>
+          <View style={styles.row}>
+            <IconButton
+              color={colors.primary}
+              icon="close"
+              size={38}
+              onPress={() => {
+                clearExpedient();
+              }}
+            />
+            <Title>{expedient.name}</Title>
+          </View>
         )}
         {kb && (
-          <Button
-            color={colors.primary}
-            icon="close"
-            onPress={() => {
-              clearKb();
-            }}>
-            {kb.knowledgebase.properties.title}
-          </Button>
+          <View style={styles.row}>
+            <IconButton
+              color={colors.primary}
+              icon="close"
+              size={32}
+              onPress={() => {
+                clearKb();
+              }}
+            />
+            <Title>{kb.knowledgebase.properties.title}</Title>
+          </View>
         )}
         {result && <ShowResult kb={kb} result={result} saveExam={saveExam} />}
 
         {content}
       </View>
-      <Snackbar
-        visible={snackVisible}
-        onDismiss={onDismissSnackBar}
-        action={{
-          label: 'Ok',
-          onPress: () => {
-            // Do something
-          },
-        }}>
-        {snackMessage}
-      </Snackbar>
     </ScrollView>
   );
 };
@@ -176,6 +185,11 @@ const styles = StyleSheet.create({
     margin: 2,
     paddingVertical: 6,
     paddingHorizontal: 16,
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

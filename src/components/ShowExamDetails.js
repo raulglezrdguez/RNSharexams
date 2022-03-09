@@ -3,7 +3,14 @@
 /* eslint-disable no-eval */
 import React, {useEffect, useState} from 'react';
 import {ScrollView, StyleSheet, View} from 'react-native';
-import {Button, Card, List, Paragraph, useTheme} from 'react-native-paper';
+import {
+  Button,
+  Card,
+  IconButton,
+  List,
+  Paragraph,
+  useTheme,
+} from 'react-native-paper';
 
 import {usePreferencesState} from '../context/preferences';
 
@@ -60,8 +67,9 @@ const ShowExamDetails = ({exam, setDetail2Show}) => {
             title={exam?.filename}
             titleNumberOfLines={2}
             left={() => (
-              <Button
+              <IconButton
                 icon="close"
+                size={38}
                 color={colors.error}
                 onPress={() => setDetail2Show(null)}
               />

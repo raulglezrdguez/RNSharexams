@@ -1,14 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useState} from 'react';
 import {ScrollView, StyleSheet, View} from 'react-native';
-import {
-  Button,
-  Card,
-  List,
-  Snackbar,
-  Title,
-  useTheme,
-} from 'react-native-paper';
+import {Card, IconButton, List, Title, useTheme} from 'react-native-paper';
 import RNFS from 'react-native-fs';
 
 import {
@@ -24,11 +17,6 @@ const ShowExpedients = () => {
   const dispatch = usePreferencesDispatch();
 
   const [id2Edit, setId2Edit] = useState(null);
-
-  const [snackVisible, setSnackVisible] = useState(false);
-  const [snackMessage, setSnackMessage] = useState('');
-
-  const onDismissSnackBar = () => setSnackVisible(false);
 
   const saveExpedients = newExpedients => {
     let exp = JSON.stringify(newExpedients);
@@ -55,9 +43,10 @@ const ShowExpedients = () => {
               r.name.endsWith('.data') &&
               r.name.includes(exp.identifier)
             ) {
-              console.log(r);
-              setSnackMessage('Expediente con exámenes.');
-              setSnackVisible(true);
+              dispatch({
+                type: 'SET_SNACK_MESSAGE',
+                payload: 'Expediente con exámenes.',
+              });
 
               deleteFile = false;
             }
@@ -72,16 +61,23 @@ const ShowExpedients = () => {
               dispatch({type: 'SET_EXPEDIENTS', payload: newExps});
               saveExpedients(newExps);
 
-              setSnackMessage('Expediente eliminado.');
+              dispatch({
+                type: 'SET_SNACK_MESSAGE',
+                payload: 'Expediente eliminado.',
+              });
             } else {
-              setSnackMessage('Expediente no encontrado.');
+              dispatch({
+                type: 'SET_SNACK_MESSAGE',
+                payload: 'Expediente no encontrado.',
+              });
             }
-            setSnackVisible(true);
           }
         })
         .catch(err => {
-          setSnackMessage('Error al leer ficheros.');
-          setSnackVisible(true);
+          dispatch({
+            type: 'SET_SNACK_MESSAGE',
+            payload: 'Error al leer ficheros.',
+          });
           console.log(err.message, err.code);
         });
     }
@@ -95,18 +91,23 @@ const ShowExpedients = () => {
         setId2Edit={setId2Edit}
       />
     ) : (
-      <Card>
+      <Card style={{marginVertical: 5}}>
         <List.Item
           key={exp.id}
           title={`${exp.name} - ${exp.identifier}`}
           titleNumberOfLines={2}
           right={() => (
-            <Button icon="account-edit" onPress={() => setId2Edit(exp.id)} />
+            <IconButton
+              icon="account-edit"
+              size={38}
+              onPress={() => setId2Edit(exp.id)}
+            />
           )}
           left={() => (
-            <Button
+            <IconButton
               color={colors.error}
               icon="delete"
+              size={38}
               onPress={() => {
                 delExpedient(exp.id);
               }}
@@ -125,17 +126,6 @@ const ShowExpedients = () => {
           <List.Section>{expList}</List.Section>
         </ScrollView>
       </View>
-      <Snackbar
-        visible={snackVisible}
-        onDismiss={onDismissSnackBar}
-        action={{
-          label: 'Ok',
-          onPress: () => {
-            // Do something
-          },
-        }}>
-        {snackMessage}
-      </Snackbar>
     </View>
   );
 };

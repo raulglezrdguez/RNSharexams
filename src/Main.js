@@ -1,10 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {createDrawerNavigator} from '@react-navigation/drawer';
 import {
   DarkTheme as PaperDarkTheme,
   DefaultTheme as PaperDefaultTheme,
   Provider as PaperProvider,
+  Snackbar,
 } from 'react-native-paper';
 import {
   NavigationContainer,
@@ -47,9 +48,15 @@ const CombinedDarkTheme = {
 };
 
 const Main = () => {
-  const {theme} = usePreferencesState();
+  const {theme, snackMessage} = usePreferencesState();
   const dispatch = usePreferencesDispatch();
   const userTheme = theme === 'dark' ? CombinedDarkTheme : CombinedDefaultTheme;
+
+  const onDismissSnackBar = () =>
+    dispatch({
+      type: 'SET_SNACK_MESSAGE',
+      payload: '',
+    });
 
   const createFile = (name, content) => {
     // create a path you want to write to
@@ -111,6 +118,17 @@ const Main = () => {
           />
         </Drawer.Navigator>
       </NavigationContainer>
+      <Snackbar
+        visible={snackMessage !== ''}
+        onDismiss={onDismissSnackBar}
+        action={{
+          label: 'Ok',
+          onPress: () => {
+            // Do something
+          },
+        }}>
+        {snackMessage}
+      </Snackbar>
     </PaperProvider>
   );
 };

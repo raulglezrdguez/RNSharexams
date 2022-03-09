@@ -1,33 +1,45 @@
 import React, {useState} from 'react';
 import {ScrollView, StyleSheet, View} from 'react-native';
-import {Button, Card, List, Paragraph, Title} from 'react-native-paper';
+import {
+  Button,
+  Card,
+  IconButton,
+  List,
+  Paragraph,
+  Title,
+  useTheme,
+} from 'react-native-paper';
 
 import {usePreferencesState} from '../context/preferences';
 
 const SelectKb = ({setKb}) => {
+  const {colors} = useTheme();
   const {kbs} = usePreferencesState();
   const [detailsKb, setDetailsKb] = useState(null);
-  console.log(kbs);
 
   const kbsList = kbs.map(kb => (
     <View key={kb.knowledgebase.properties.title}>
       <List.Item
         title={kb.knowledgebase.properties.title}
         right={() => (
-          <Button
+          <IconButton
             icon="play"
+            size={38}
+            color={colors.primary}
             onPress={() => {
               setKb(kb);
             }}
           />
         )}
         left={() => (
-          <Button
+          <IconButton
             icon={
               detailsKb && detailsKb === kb.knowledgebase.properties.title
                 ? 'dots-vertical'
                 : 'dots-horizontal'
             }
+            size={38}
+            color={colors.accent}
             onPress={() => {
               detailsKb && detailsKb === kb.knowledgebase.properties.title
                 ? setDetailsKb(null)

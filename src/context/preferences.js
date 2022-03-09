@@ -34,6 +34,12 @@ const preferencesReducer = (state, action) => {
         kbs: [...state.kbs, action.payload],
       };
 
+    case 'SET_SNACK_MESSAGE':
+      return {
+        ...state,
+        snackMessage: action.payload,
+      };
+
     default:
       return state;
   }
@@ -44,6 +50,7 @@ export const PreferencesProvider = ({children}) => {
     theme: 'light',
     expedients: [],
     kbs: [],
+    snackMessage: '',
   };
   const [state, dispatch] = useReducer(preferencesReducer, initialState);
 

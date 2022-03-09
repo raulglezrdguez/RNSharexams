@@ -1,12 +1,13 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useState} from 'react';
 import {ScrollView, StyleSheet, View} from 'react-native';
-import {Button, Card, List, Title} from 'react-native-paper';
+import {Card, IconButton, List, Title, useTheme} from 'react-native-paper';
 
 import {usePreferencesState} from '../context/preferences';
 import ShowExamsDetails from './ShowExamsDetails';
 
 const ShowExams = () => {
+  const {colors} = useTheme();
   const {expedients} = usePreferencesState();
 
   const [id2Show, setId2Show] = useState(null);
@@ -25,7 +26,12 @@ const ShowExams = () => {
           title={`${exp.name} - ${exp.identifier}`}
           titleNumberOfLines={2}
           right={() => (
-            <Button icon="page-next" onPress={() => setId2Show(exp.id)} />
+            <IconButton
+              icon="page-next"
+              color={colors.primary}
+              size={38}
+              onPress={() => setId2Show(exp.id)}
+            />
           )}
         />
       </Card>

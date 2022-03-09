@@ -1,15 +1,19 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {useEffect, useState} from 'react';
 import {ScrollView, StyleSheet, View} from 'react-native';
-import {Button, List, Snackbar, useTheme} from 'react-native-paper';
+import {Button, IconButton, List, useTheme} from 'react-native-paper';
 import RNFS from 'react-native-fs';
 
-import {usePreferencesState} from '../context/preferences';
+import {
+  usePreferencesState,
+  usePreferencesDispatch,
+} from '../context/preferences';
 import ShowExamDetails from './ShowExamDetails';
 
 const ShowExamsDetails = ({expedientId, setId2Show}) => {
   const {colors} = useTheme();
   const {expedients} = usePreferencesState();
+  const dispatch = usePreferencesDispatch();
 
   const [name, setName] = useState('');
   const [birthdate, setBirthdate] = useState(new Date(1950, 0, 1));
@@ -18,11 +22,6 @@ const ShowExamsDetails = ({expedientId, setId2Show}) => {
   const [exams, setExams] = useState([]);
 
   const [detail2Show, setDetail2Show] = useState(null);
-
-  const [snackVisible, setSnackVisible] = useState(false);
-  const [snackMessage, setSnackMessage] = useState('');
-
-  const onDismissSnackBar = () => setSnackVisible(false);
 
   useEffect(() => {
     const currentExpedient = expedients.find(exp => exp.id === expedientId);
@@ -78,8 +77,10 @@ const ShowExamsDetails = ({expedientId, setId2Show}) => {
         console.log('FILE DELETED');
         const newExams = exams.filter(e => e.filename !== filename);
         setExams(newExams);
-        setSnackMessage('Examen eliminado.');
-        setSnackVisible(true);
+        dispatch({
+          type: 'SET_SNACK_MESSAGE',
+          payload: 'Examen eliminado.',
+        });
       })
       // `unlink` will throw an error, if the item to unlink does not exist
       .catch(err => {
@@ -99,14 +100,17 @@ const ShowExamsDetails = ({expedientId, setId2Show}) => {
           title={`${exm.filename}`}
           titleNumberOfLines={2}
           right={() => (
-            <Button
+            <IconButton
               icon="page-next"
+              size={38}
+              color={colors.primary}
               onPress={() => setDetail2Show(exm.filename)}
             />
           )}
           left={() => (
-            <Button
+            <IconButton
               icon="delete"
+              size={38}
               color={colors.error}
               onPress={() => deleteExam(exm.filename)}
             />
@@ -127,8 +131,9 @@ const ShowExamsDetails = ({expedientId, setId2Show}) => {
               titleNumberOfLines={2}
               descriptionNumberOfLines={4}
               left={() => (
-                <Button
+                <IconButton
                   icon="close"
+                  size={38}
                   color={colors.error}
                   onPress={() => setId2Show(null)}
                 />
@@ -138,17 +143,6 @@ const ShowExamsDetails = ({expedientId, setId2Show}) => {
           {examsList}
         </ScrollView>
       </View>
-      <Snackbar
-        visible={snackVisible}
-        onDismiss={onDismissSnackBar}
-        action={{
-          label: 'Ok',
-          onPress: () => {
-            // Do something
-          },
-        }}>
-        {snackMessage}
-      </Snackbar>
     </View>
   );
 };
