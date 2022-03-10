@@ -91,7 +91,7 @@ const ShowExpedients = () => {
         setId2Edit={setId2Edit}
       />
     ) : (
-      <Card style={{marginVertical: 5}}>
+      <Card key={exp.id} style={{marginVertical: 5}}>
         <List.Item
           key={exp.id}
           title={`${exp.name} - ${exp.identifier}`}

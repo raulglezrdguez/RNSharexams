@@ -9,9 +9,8 @@ const SelectExpedients = ({setExpedient}) => {
   const {expedients} = usePreferencesState();
 
   const expList = expedients.map(exp => (
-    <Card>
+    <Card key={exp.identifier}>
       <List.Item
-        key={exp.identifier}
         title={`${exp.name} - ${exp.identifier}`}
         right={() => (
           <IconButton

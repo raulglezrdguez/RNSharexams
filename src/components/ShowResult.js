@@ -7,7 +7,6 @@ import {Button, Card, Paragraph, useTheme, List} from 'react-native-paper';
 const ShowResult = ({kb, result, saveExam}) => {
   const {colors} = useTheme();
   const [details, setDetails] = useState(false);
-  console.log(result);
 
   let detailsView = null;
   if (details) {

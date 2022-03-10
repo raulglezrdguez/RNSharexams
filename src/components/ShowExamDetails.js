@@ -19,9 +19,6 @@ const ShowExamDetails = ({exam, setDetail2Show}) => {
   const {kbs} = usePreferencesState();
   const [detailsView, setDetailsView] = useState(null);
 
-  console.log(kbs);
-  console.log(exam);
-
   useEffect(() => {
     const kb = kbs.find(k => k.filename === exam.kb);
     const reValue = new RegExp('\\bvalue\\b', 'gi');

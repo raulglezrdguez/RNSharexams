@@ -1,10 +1,10 @@
 import React, {useState, useEffect} from 'react';
-import RNFS from 'react-native-fs';
 
 import {
   usePreferencesState,
   usePreferencesDispatch,
 } from '../context/preferences';
+import {saveExpedients} from '../utils/fs';
 
 import WorkExpedient from './WorkExpedient';
 
@@ -39,23 +39,7 @@ const NewExpedient = () => {
     });
   }, []);
 
-  const saveExpedients = newExpedients => {
-    let exp = JSON.stringify(newExpedients);
-    let expedientsFile = RNFS.ExternalDirectoryPath + '/expedients.db';
-
-    RNFS.writeFile(expedientsFile, exp, 'utf8')
-      .then(success => {
-        dispatch({
-          type: 'SET_SNACK_MESSAGE',
-          payload: 'Datos almacenados correctamente.',
-        });
-      })
-      .catch(err => {
-        console.log(err.message);
-      });
-  };
-
-  const addExpedient = expedient => {
+  const addExpedient = async expedient => {
     const found = expedients.find(
       exp => exp.identifier === expedient.identifier || exp.id === expedient.id,
     );
@@ -63,7 +47,13 @@ const NewExpedient = () => {
     if (typeof found === 'undefined') {
       const newExpedients = [...expedients, expedient];
       dispatch({type: 'SET_EXPEDIENTS', payload: newExpedients});
-      saveExpedients(newExpedients);
+      const result = await saveExpedients(newExpedients);
+      dispatch({
+        type: 'SET_SNACK_MESSAGE',
+        payload: result
+          ? 'Datos almacenados correctamente.'
+          : 'Error al almacenar los datos.',
+      });
     } else {
       dispatch({
         type: 'SET_SNACK_MESSAGE',

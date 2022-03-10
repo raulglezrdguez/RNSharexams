@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {useEffect, useState} from 'react';
 import {ScrollView, StyleSheet, View} from 'react-native';
-import {Button, IconButton, List, useTheme} from 'react-native-paper';
+import {IconButton, List, useTheme} from 'react-native-paper';
 import RNFS from 'react-native-fs';
 
 import {
@@ -44,7 +44,6 @@ const ShowExamsDetails = ({expedientId, setId2Show}) => {
               r.name.endsWith('.data') &&
               r.name.includes(currentExpedient.identifier)
             ) {
-              console.log(currentExpedient.identifier, r.name);
               RNFS.readFile(r.path, 'utf8')
                 .then(content => {
                   const parsedContent = JSON.parse(content);
@@ -69,7 +68,7 @@ const ShowExamsDetails = ({expedientId, setId2Show}) => {
   }, [expedientId]);
 
   const deleteExam = filename => {
-    // create a path you want to delete
+    // path to delete
     const path = RNFS.ExternalDirectoryPath + `/${filename}.data`;
 
     RNFS.unlink(path)
@@ -87,6 +86,7 @@ const ShowExamsDetails = ({expedientId, setId2Show}) => {
         console.log(err.message);
       });
   };
+
   const examsList = exams.map(exm =>
     detail2Show && detail2Show === exm.filename ? (
       <ShowExamDetails

@@ -6,6 +6,7 @@ import {
   usePreferencesState,
   usePreferencesDispatch,
 } from '../context/preferences';
+import {saveExpedients} from '../utils/fs';
 
 import WorkExpedient from './WorkExpedient';
 
@@ -26,9 +27,7 @@ const EditExpedient = ({expedientId, setId2Edit}) => {
 
   useEffect(() => {
     const currentExpedient = expedients.find(exp => exp.id === expedientId);
-    console.log(expedients);
     if (currentExpedient) {
-      console.log(currentExpedient);
       setInitialData({
         province: currentExpedient.province,
         municipality: currentExpedient.municipality,
@@ -42,23 +41,7 @@ const EditExpedient = ({expedientId, setId2Edit}) => {
     }
   }, [expedientId]);
 
-  const saveExpedients = newExpedients => {
-    let exp = JSON.stringify(newExpedients);
-    let expedientsFile = RNFS.ExternalDirectoryPath + '/expedients.db';
-
-    RNFS.writeFile(expedientsFile, exp, 'utf8')
-      .then(success => {
-        dispatch({
-          type: 'SET_SNACK_MESSAGE',
-          payload: 'Datos modificados correctamente.',
-        });
-      })
-      .catch(err => {
-        console.log(err.message);
-      });
-  };
-
-  const updExpedient = expedient => {
+  const updExpedient = async expedient => {
     let newExps = [...expedients];
     const index = newExps.findIndex(e => e.id === expedient.id);
     if (index !== -1) {
@@ -66,7 +49,13 @@ const EditExpedient = ({expedientId, setId2Edit}) => {
       newExps = [...newExps, expedient];
 
       dispatch({type: 'SET_EXPEDIENTS', payload: newExps});
-      saveExpedients(newExps);
+      const result = await saveExpedients(newExps);
+      dispatch({
+        type: 'SET_SNACK_MESSAGE',
+        payload: result
+          ? 'Datos modificados correctamente.'
+          : 'Error al modificar los datos.',
+      });
     }
   };
 

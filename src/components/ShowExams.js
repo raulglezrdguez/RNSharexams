@@ -20,9 +20,8 @@ const ShowExams = () => {
         setId2Show={setId2Show}
       />
     ) : (
-      <Card>
+      <Card key={exp.id} style={{marginVertical: 5}}>
         <List.Item
-          key={exp.id}
           title={`${exp.name} - ${exp.identifier}`}
           titleNumberOfLines={2}
           right={() => (
